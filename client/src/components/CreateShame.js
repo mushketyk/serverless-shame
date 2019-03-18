@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Form, Button } from 'semantic-ui-react'
+import { Form, Button } from 'semantic-ui-react';
+import { Auth } from 'aws-amplify'
 
 class CreateShame extends Component {
 
@@ -7,7 +8,8 @@ class CreateShame extends Component {
     super(props);
     this.state = {
       crime: '',
-      shame: ''
+      shame: '',
+      authData: undefined
     };
 
     this.handleCrimeChange = this.handleCrimeChange.bind(this);
@@ -24,19 +26,37 @@ class CreateShame extends Component {
     this.setState({shame: event.target.value});
   }
 
+  async componentDidMount() {
+    try {
+      const authData = await Auth.currentSession();
+      console.log('Auth data', authData);
+      this.setState({
+        authData
+      })
+    } catch (e) {
+      console.log('Error failing current session', e);
+    }
+  }
+
   async handleSubmit(event) {
     event.preventDefault();
     try {
+      const data = {
+        crime: this.state.crime,
+        shame: this.state.shame
+      }
+
       await fetch('https://qbj898xhwe.execute-api.eu-central-1.amazonaws.com/dev/shames', {
         method: "POST", // *GET, POST, PUT, DELETE, etc.
         mode: "cors", // no-cors, cors, *same-origin
         headers: {
             "Content-Type": "application/json",
+            "Authorization": this.state.authData.idToken.jwtToken
         },
-        body: JSON.stringify(this.state)
+        body: JSON.stringify(data)
       });
 
-      alert('Shame to them!' + JSON.stringify(this.state));
+      alert('Shame to them!' + JSON.stringify(data));
       this.setState({
         crime: '',
         shame: ''
