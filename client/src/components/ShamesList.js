@@ -14,24 +14,6 @@ class ShamesList extends Component {
       error: undefined,
       shames: []
     }
-    // this.setState({
-    // })
-    // this.UNSAFE_componentWillMount.s
-    // this.state.error = undefined
-    // this.state.shames = [
-    // {
-    //   reporter: 'John Woods',
-    //   crime: 'Portafilter is dirty',
-    //   shame: 'Oh no-no-no',
-    //   timestamp: '2019-03-18T13:24:15+0000'
-    // },
-    // {
-    //   reporter: 'Anonymous',
-    //   crime: 'Wrongful shaming',
-    //   shame: 'Somebody is creating bogus shames',
-    //   timestamp: '2019-03-18T13:24:15+0000'
-    // }
-    // ]
   }
 
   async componentDidMount() {
@@ -51,7 +33,6 @@ class ShamesList extends Component {
         error: e.message
       })
     }
-    // console.log('GrandChild did mount.');
   }
 
   render() {

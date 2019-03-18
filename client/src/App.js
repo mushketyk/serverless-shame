@@ -1,34 +1,51 @@
+import { Auth } from 'aws-amplify';
 import React, { Component } from 'react';
-import ShamesList from './components/ShamesList'
+import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+import { Grid, Menu, Segment } from 'semantic-ui-react';
 import './App.css';
 import CreateShame from './components/CreateShame';
+import Register from './components/Register';
+import ShamesList from './components/ShamesList';
 import SignIn from './components/SignIn';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
-import {
-  Menu,
-  Button,
-  Container,
-  Divider,
-  Grid,
-  Header,
-  Icon,
-  Image,
-  List,
-  Responsive,
-  Segment,
-  Sidebar,
-  Visibility,
-} from 'semantic-ui-react'
 
 class App extends Component {
 
-  state = { activeItem: 'home' }
+  state = { authData: undefined }
 
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+  constructor() {
+    super();
+
+    this.onSignOut = this.onSignOut.bind(this);
+  }
+
+  async componentDidMount() {
+    try {
+      const authData = await Auth.currentSession();
+      console.log('Auth data', authData);
+      this.setState({
+        authData
+      })
+    } catch (e) {
+      console.log('Error failing current session', e);
+    }
+  }
+
+  async onSignOut(event) {
+    event.preventDefault();
+
+    try {
+      await Auth.signOut()
+      this.setState({
+        authData: undefined
+      })
+      alert('Signed out')
+    } catch (e) {
+      console.log('Failed to sign out ', e.message)
+      alert('Failed to sign out')
+    }
+  }
 
   render() {
-    // const { activeItem } = this.state
-
     return (
       <div>
         <Segment style={{ padding: '8em 0em' }} vertical>
@@ -37,30 +54,11 @@ class App extends Component {
               <Grid.Column width={20}>
                 <Router>
                   <div>
-                    <Menu>
-                      <Menu.Item name='home'
-                        onClick={this.handleItemClick} >
-                        <Link to="/">Home</Link>
-                      </Menu.Item>
-
-                      <Menu.Item
-                        name='create'
-                        onClick={this.handleItemClick}
-                      >
-                        <Link to="/create/">Create</Link>
-                      </Menu.Item>
-
-                      <Menu.Item
-                        name='signin'
-                        onClick={this.handleItemClick}
-                      >
-                        <Link to="/signin">Sign in</Link>
-                      </Menu.Item>
-
-                    </Menu>
+                    {this.generateMenu()}
 
                     <Route path="/create/" component={CreateShame} />
                     <Route path="/signin/" component={SignIn} />
+                    <Route path="/register/" component={Register} />
                     <Route path="/" exact component={ShamesList} />
                   </div>
                 </Router>
@@ -70,6 +68,44 @@ class App extends Component {
         </Segment>
       </div>
     )
+  }
+
+  generateMenu() {
+    if (this.state.authData) {
+      return (
+        <Menu>
+          <Menu.Item name='home'>
+            <Link to="/">Home</Link>
+          </Menu.Item>
+
+          <Menu.Item name='create'>
+            <Link to="/create/">Create</Link>
+          </Menu.Item>
+
+          <Menu.Item name='signout'>
+            <a href="#" onClick={this.onSignOut}  >Sign out</a>
+          </Menu.Item>
+
+        </Menu>
+      )
+    } else {
+      return (
+        <Menu>
+          <Menu.Item name='home'>
+            <Link to="/">Home</Link>
+          </Menu.Item>
+
+          <Menu.Item name='signin'>
+            <Link to="/signin">Sign in</Link>
+          </Menu.Item>
+
+          <Menu.Item name='register'>
+            <Link to="/register">Register</Link>
+          </Menu.Item>
+
+        </Menu>
+      )
+    }
   }
 }
 

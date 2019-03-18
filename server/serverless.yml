@@ -63,6 +63,8 @@ functions:
           method: post
           path: shames
           cors: true
+          authorizer:
+              arn: "arn:aws:cognito-idp:eu-central-1:913036176028:userpool/eu-central-1_yGyVX47DQ"
         # get shames
         # cors: true
 
@@ -118,6 +120,12 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+
+    # CognitoUserPool:
+    #   Type: 'AWS::Cognito::UserPool'
+    #   UserPoolName: UserPool-${opt:stage, self:provider.stage}
+
+
 
 # you can add CloudFormation resource templates here
 #resources:

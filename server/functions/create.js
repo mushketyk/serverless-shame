@@ -11,6 +11,7 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 const tableName = process.env.DYNAMODB_TABLE;
 
 module.exports.handler = async (event) => {
+  console.log('Caller identity', event.identity);
   console.log('Creating shame with data ', event.body);
   const timestamp = new Date().toISOString();
 
