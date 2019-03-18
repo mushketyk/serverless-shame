@@ -9,6 +9,15 @@ provider:
   stage: dev
   region: eu-central-1
   profile: serverless
+  environment:
+    DYNAMODB_TABLE: Shame-${opt:stage, self:provider.stage}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -41,10 +50,14 @@ provider:
 
 functions:
   get-shames:
-    handler: handler.hello
+    handler: handler.getShames
     events:
-      - http: get shames
-        cors: true
+      - http:
+          method: get
+          path: shames
+          cors: true
+        # get shames
+        # cors: true
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -79,6 +92,25 @@ functions:
 #    Define function environment variables here
 #    environment:
 #      variable2: value2
+
+resources:
+  Resources:
+    ShamesDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
 
 # you can add CloudFormation resource templates here
 #resources:

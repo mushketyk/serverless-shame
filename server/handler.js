@@ -1,6 +1,23 @@
 'use strict';
 
-module.exports.hello = async (event) => {
+const AWS = require('aws-sdk');
+
+const bluebird = require('bluebird');
+AWS.config.setPromisesDependency(bluebird);
+// var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
+const docClient = new AWS.DynamoDB.DocumentClient();
+
+const tableName = process.env.DYNAMODB_TABLE;
+
+module.exports.getShames = async (event) => {
+  console.log('Fetching all shames');
+  const result = await docClient.scan({
+    TableName: tableName
+  }).promise();
+
+  console.log('Fetched shames: ', {
+    items: result.Items
+  });
   return {
     statusCode: 200,
     headers: {
@@ -8,20 +25,7 @@ module.exports.hello = async (event) => {
       'Access-Control-Allow-Credentials': true,
     },
     body: JSON.stringify(
-      [
-        {
-          reporter: 'John Woods',
-          crime: 'Portafilter is dirty',
-          shame: 'Oh no-no-no',
-          timestamp: '2019-03-18T13:24:15+0000'
-        },
-        {
-          reporter: 'Anonymous',
-          crime: 'Wrongful shaming',
-          shame: 'Somebody is creating bogus shames',
-          timestamp: '2019-03-18T13:24:15+0000'
-        }
-      ]
+      result.Items
     ),
   };
 
