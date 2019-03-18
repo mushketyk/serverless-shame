@@ -50,10 +50,17 @@ provider:
 
 functions:
   get-shames:
-    handler: handler.getShames
+    handler: functions/getAll.handler
     events:
       - http:
           method: get
+          path: shames
+          cors: true
+  create:
+    handler: functions/create.handler
+    events:
+      - http:
+          method: post
           path: shames
           cors: true
         # get shames

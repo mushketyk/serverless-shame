@@ -4,12 +4,11 @@ const AWS = require('aws-sdk');
 
 const bluebird = require('bluebird');
 AWS.config.setPromisesDependency(bluebird);
-// var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 const docClient = new AWS.DynamoDB.DocumentClient();
 
 const tableName = process.env.DYNAMODB_TABLE;
 
-module.exports.getShames = async (event) => {
+module.exports.handler = async (event) => {
   console.log('Fetching all shames');
   const result = await docClient.scan({
     TableName: tableName
@@ -18,6 +17,7 @@ module.exports.getShames = async (event) => {
   console.log('Fetched shames: ', {
     items: result.Items
   });
+
   return {
     statusCode: 200,
     headers: {
