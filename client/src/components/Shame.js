@@ -7,6 +7,10 @@ class Shame extends Component {
     <Card>
       <Card.Content>
         <Card.Header>{this.props.shame.crime}</Card.Header>
+        {
+          this.props.shame.imageUrl &&
+          <Image src={this.props.shame.imageUrl} />
+        }
         <Card.Meta>{this.props.shame.reporter}</Card.Meta>
         <Card.Meta>{this.props.shame.timestamp}</Card.Meta>
         <Card.Description>

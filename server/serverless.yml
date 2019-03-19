@@ -11,6 +11,8 @@ provider:
   profile: serverless
   environment:
     DYNAMODB_TABLE: Shame-${opt:stage, self:provider.stage}
+    FILES_S3_BUCKET: serverless-shame-2019-${opt:stage, self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
 
   iamRoleStatements:
     - Effect: Allow
@@ -18,7 +20,12 @@ provider:
         - dynamodb:Scan
         - dynamodb:PutItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:PutObjectAcl
+      Resource: "arn:aws:s3:::${self:provider.environment.FILES_S3_BUCKET}/*"
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
 #    - Effect: "Allow"
@@ -120,16 +127,53 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
-
-    GatewayResponseDefault4XX:
-      Type: 'AWS::ApiGateway::GatewayResponse'
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
       Properties:
-        ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
-        ResponseType: DEFAULT_4XX
-        RestApiId:
-          Ref: 'ApiGatewayRestApi'
+        PolicyDocument:
+          Id: MyPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: !Join 
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref AttachmentsBucket
+                  - /*
+        Bucket: !Ref AttachmentsBucket
+    AttachmentsBucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
+      Properties:
+        BucketName: ${self:provider.environment.FILES_S3_BUCKET}
+        # Set the CORS policy
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    # GatewayResponseDefault4XX:
+    #   Type: 'AWS::ApiGateway::GatewayResponse'
+    #   Properties:
+    #     ResponseParameters:
+    #       gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+    #       gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+    #     ResponseType: DEFAULT_4XX
+    #     RestApiId:
+    #       Ref: 'ApiGatewayRestApi'
 
     # CognitoUserPool:
     #   Type: 'AWS::Cognito::UserPool'

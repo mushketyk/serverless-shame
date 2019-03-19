@@ -7,8 +7,11 @@ const uuid = require('uuid');
 var jwtDecode = require('jwt-decode');
 
 const docClient = new AWS.DynamoDB.DocumentClient();
+const s3 = new AWS.S3();
 
 const tableName = process.env.DYNAMODB_TABLE;
+const bucketName = process.env.FILES_S3_BUCKET;
+const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
 
 module.exports.handler = async (event) => {
   console.log('Caller event', event);
@@ -20,16 +23,24 @@ module.exports.handler = async (event) => {
   const reporter = `${decodedJwt.given_name} ${decodedJwt.family_name}`; 
 
   const bodyJson = JSON.parse(event.body);
+  const shameId = uuid.v4();
 
   const newItem = await docClient.put({
     TableName: tableName,
     Item: {
-      id: uuid.v4(),
+      id: shameId,
       ...bodyJson,
       reporter: reporter,
-      timestamp
+      timestamp,
+      imageUrl: `https://${bucketName}.s3.amazonaws.com/${shameId}`
     }
   }).promise();
+
+  const url = s3.getSignedUrl('putObject', {
+    Bucket: bucketName,
+    Key: shameId,
+    Expires: urlExpiration
+  })
 
   return {
     statusCode: 201,
@@ -37,8 +48,9 @@ module.exports.handler = async (event) => {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true,
     },
-    body: JSON.stringify(
-      newItem.Attributes
-    ),
+    body: JSON.stringify({
+      newItem: newItem.Attributes,
+      uploadUrl: url
+    }),
   };
 };
