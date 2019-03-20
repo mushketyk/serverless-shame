@@ -33,6 +33,7 @@ class SignIn extends Component {
 
     console.log('Auth user: ', user)
     console.log('JWT token: ', user.signInUserSession.accessToken.jwtToken)
+    alert('Signed in');
   }
 
   render() {
