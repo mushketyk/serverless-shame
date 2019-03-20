@@ -10,11 +10,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "aws-xray-sdk": "^2.2.0",
     "bluebird": "^3.5.3",
     "jwt-decode": "^2.2.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "aws-sdk": "^2.422.0"
+    "aws-sdk": "^2.422.0",
+    "serverless-plugin-tracing": "^2.0.0"
   }
 }

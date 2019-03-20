@@ -9,6 +9,7 @@ provider:
   stage: dev
   region: eu-central-1
   profile: serverless
+  tracing: true # enable tracing
   environment:
     DYNAMODB_TABLE: Shame-${opt:stage, self:provider.stage}
     FILES_S3_BUCKET: serverless-shame-2019-${opt:stage, self:provider.stage}
@@ -26,6 +27,16 @@ provider:
         - s3:GetObject
         - s3:PutObjectAcl
       Resource: "arn:aws:s3:::${self:provider.environment.FILES_S3_BUCKET}/*"
+    - Effect: "Allow" # xray permissions (required)
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
+
+plugins:
+  - serverless-plugin-tracing
+
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
 #    - Effect: "Allow"
