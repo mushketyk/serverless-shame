@@ -12,6 +12,7 @@ provider:
   tracing: true # enable tracing
   environment:
     DYNAMODB_TABLE: Shame-${opt:stage, self:provider.stage}
+    CONNECTIONS_TABLE: Connections-${opt:stage, self:provider.stage}
     FILES_S3_BUCKET: serverless-shame-2019-${opt:stage, self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
@@ -20,7 +21,14 @@ provider:
       Action:
         - dynamodb:Scan
         - dynamodb:PutItem
+        - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}"
     - Effect: Allow
       Action:
         - s3:PutObject
@@ -67,6 +75,16 @@ plugins:
 #    - exclude-me-dir/**
 
 functions:
+  connectHandler:
+    handler: functions/websockets/connect.handler
+    events:
+      - websocket:
+          route: $connect
+  disconnectHandler:
+    handler: functions/websockets/disconnect.handler
+    events:
+      - websocket:
+          route: $disconnect
   get-shames:
     handler: functions/getAll.handler
     events:
@@ -138,6 +156,22 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+    WebSocketConnectionsDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.CONNECTIONS_TABLE}
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
