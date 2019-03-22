@@ -20,6 +20,11 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
+        - codedeploy:*
+      Resource:
+        - "*"
+    - Effect: Allow
+      Action:
         - dynamodb:Scan
         - dynamodb:PutItem
         - dynamodb:DeleteItem
@@ -88,7 +93,7 @@ functions:
           route: $disconnect
   dynamoDbStream:
     environment:
-      STAGE: ${self:provider.stage}
+      STAGE: ${self:provider.stage  }
       API_ID: 
         Ref: WebsocketsApi
           # - Ref
@@ -100,6 +105,9 @@ functions:
             Fn::GetAtt: [ ShamesDynamoDBTable, StreamArn ]
   get-shames:
     handler: functions/getAll.handler
+    deploymentSettings:
+      type: Linear10PercentEvery1Minute
+      alias: Live
     events:
       - http:
           method: get

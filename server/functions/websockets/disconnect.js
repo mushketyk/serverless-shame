@@ -9,15 +9,14 @@ module.exports.handler = async (event) => {
   console.log('Websockets disconnect', event);
 
   const connectionId = event.requestContext.connectionId;
-  const item = {
-    id: connectionId
-  };
 
   console.log('Removing item: ', item);
 
   await docClient.delete({
     TableName: connectionsTable,
-    Item: item
+    Key: {
+      id: connectionId
+    }
   }).promise();
 
   return {}
