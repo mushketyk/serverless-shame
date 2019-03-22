@@ -14,6 +14,7 @@ provider:
     DYNAMODB_TABLE: Shame-${opt:stage, self:provider.stage}
     CONNECTIONS_TABLE: Connections-${opt:stage, self:provider.stage}
     FILES_S3_BUCKET: serverless-shame-2019-${opt:stage, self:provider.stage}
+    # STAGE: ${opt:stage, self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
   iamRoleStatements:
@@ -35,7 +36,7 @@ provider:
         - s3:GetObject
         - s3:PutObjectAcl
       Resource: "arn:aws:s3:::${self:provider.environment.FILES_S3_BUCKET}/*"
-    - Effect: "Allow" # xray permissions (required)
+    - Effect: "Allow"
       Action:
         - "xray:PutTraceSegments"
         - "xray:PutTelemetryRecords"
@@ -85,6 +86,18 @@ functions:
     events:
       - websocket:
           route: $disconnect
+  dynamoDbStream:
+    environment:
+      STAGE: ${self:provider.stage}
+      API_ID: 
+        Ref: WebsocketsApi
+          # - Ref
+    handler: functions/dynamoStream.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [ ShamesDynamoDBTable, StreamArn ]
   get-shames:
     handler: functions/getAll.handler
     events:
@@ -155,7 +168,10 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+
     WebSocketConnectionsDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
@@ -172,6 +188,7 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.CONNECTIONS_TABLE}
+
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -189,6 +206,7 @@ resources:
                   - !Ref AttachmentsBucket
                   - /*
         Bucket: !Ref AttachmentsBucket
+
     AttachmentsBucket:
       Type: AWS::S3::Bucket
       DeletionPolicy: Retain
