@@ -56,7 +56,7 @@ class CreateShame extends Component {
         shame: this.state.shame
       }
 
-      const reply = await fetch('https://qbj898xhwe.execute-api.eu-central-1.amazonaws.com/dev/shames', {
+      const reply = await fetch('https://pr587n4rtc.execute-api.eu-central-1.amazonaws.com/dev/shames', {
         method: "POST", // *GET, POST, PUT, DELETE, etc.
         mode: "cors", // no-cors, cors, *same-origin
         headers: {

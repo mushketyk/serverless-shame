@@ -10,13 +10,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "aws-serverless-express": "^3.3.5",
     "aws-xray-sdk": "^2.2.0",
     "bluebird": "^3.5.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
     "jwt-decode": "^2.2.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "aws-sdk": "^2.422.0",
+    "serverless-offline": "^4.9.2",
     "serverless-plugin-tracing": "^2.0.0"
   }
 }

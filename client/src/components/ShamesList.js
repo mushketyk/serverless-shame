@@ -19,7 +19,7 @@ class ShamesList extends Component {
   async componentDidMount() {
     try {
       console.log('Fetching shames')
-      const response = await fetch('https://qbj898xhwe.execute-api.eu-central-1.amazonaws.com/dev/shames')
+      const response = await fetch('https://pr587n4rtc.execute-api.eu-central-1.amazonaws.com/dev/shames')
       const shames = await response.json()
       console.log('Fetched shames', shames)
       this.setState({
