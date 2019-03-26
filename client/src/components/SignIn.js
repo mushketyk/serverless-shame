@@ -47,7 +47,7 @@ class SignIn extends Component {
           <Form.Field>
             <label>Email</label>
             <input
-              placeholder='Email' 
+              placeholder='Email'
               value={this.state.username}
               onChange={this.handleEmailChange}/>
           </Form.Field>

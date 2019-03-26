@@ -24,14 +24,11 @@ app.get('/shames', async (req, res) => {
   console.log('Fetched shames: ', {
     items: result.Items
   });
- 
-  // res.setHeader('Content-Type', 'application/json')
+
   res.json(
     result.Items
   );
 })
-
-// app.use('/', router)
 
 const server = awsServerlessExpress.createServer(app)
 exports.handler = (event, context) => { awsServerlessExpress.proxy(server, event, context) }

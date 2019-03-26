@@ -49,7 +49,7 @@ class Register extends Component {
           given_name: this.state.givenName,
           family_name: this.state.familyName
       },
-      validationData: []  //optional
+      validationData: []
     });
 
     alert('Successful authentication');
@@ -66,7 +66,7 @@ class Register extends Component {
           <Form.Field>
             <label>Email</label>
             <input
-              placeholder='Email' 
+              placeholder='Email'
               value={this.state.username}
               onChange={this.handleEmailChange}/>
           </Form.Field>

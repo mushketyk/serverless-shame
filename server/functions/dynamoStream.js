@@ -10,9 +10,6 @@ const apiId = process.env.API_ID;
 
 module.exports.handler = async (event) => {
   console.log('Processing events batch from DynamoDB', event);
-  // const domain = event.requestContext.domainName;
-  // const stage = event.requestContext.stage;
-  // const callbackUrlForAWS = util.format(util.format('https://%s/%s', domain, stage)); //construct the needed url
 
   for (const record of event.Records) {
     console.log('Processing record', record)
@@ -37,7 +34,6 @@ module.exports.handler = async (event) => {
     }
 
   }
-    // callback(null, `Successfully processed ${event.Records.length} records.`);
   return {}
 };
 
@@ -51,7 +47,7 @@ async function sendMessageToClient(connectionId, payload) {
 
   try {
     await gatewayApi.postToConnection({
-      ConnectionId: connectionId, // connectionId of the receiving ws-client
+      ConnectionId: connectionId,
       Data: JSON.stringify(payload),
     }).promise();
   } catch (e) {
@@ -65,13 +61,5 @@ async function sendMessageToClient(connectionId, payload) {
         }
       }).promise();
     }
-    // throw e;
   }
 }
-
-// module.exports.defaultHandler = async (event, context) => {
-
-//   return {
-//     statusCode: 200
-//   };
-// }

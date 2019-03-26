@@ -33,7 +33,6 @@ class CreateShame extends Component {
     this.setState({
       file: files[0]
     })
-    // this.setState({ shame: event.target.value });
   }
 
   async componentDidMount() {
@@ -57,8 +56,8 @@ class CreateShame extends Component {
       }
 
       const reply = await fetch('https://pr587n4rtc.execute-api.eu-central-1.amazonaws.com/dev/shames', {
-        method: "POST", // *GET, POST, PUT, DELETE, etc.
-        mode: "cors", // no-cors, cors, *same-origin
+        method: "POST",
+        mode: "cors",
         headers: {
           "Content-Type": "application/json",
           "Authorization": this.state.authData.idToken.jwtToken

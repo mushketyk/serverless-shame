@@ -4,10 +4,6 @@ import { Card } from 'semantic-ui-react'
 
 class ShamesList extends Component {
 
-  // state = { error: undefined,
-  //   shames: []
-  // }
-
   constructor(props) {
     super(props);
     this.state = {

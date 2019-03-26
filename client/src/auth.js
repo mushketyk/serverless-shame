@@ -3,9 +3,6 @@ import Amplify from 'aws-amplify';
 export const  authConfig = Amplify.configure({
     Auth: {
 
-        // REQUIRED only for Federated Authentication - Amazon Cognito Identity Pool ID
-        // identityPoolId: 'XX-XXXX-X:XXXXXXXX-XXXX-1234-abcd-1234567890ab',
-        
         // REQUIRED - Amazon Cognito Region
         region: 'eu-central-1',
 
@@ -38,7 +35,7 @@ export const  authConfig = Amplify.configure({
 
         // OPTIONAL - customized storage object
         // storage: new MyStorage(),
-        
+
         // OPTIONAL - Manually set the authentication flow type. Default is 'USER_SRP_AUTH'
         authenticationFlowType: 'USER_PASSWORD_AUTH'
     }
